@@ -20,6 +20,8 @@ class Provisioner
 
   def provision(username, github_id)
     GitHub.new(@client).apply(username, github_id)
+    Keycloak.new(@client).apply(username, password)
+    Concourse.new(@client).apply(username)
   end
 
 #  def deployment_resource

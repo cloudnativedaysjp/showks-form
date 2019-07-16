@@ -5,11 +5,11 @@ class GitHub
   end
 
   def apply(username, github_id)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('deployments').create_resource(github_resource(username, github_id))
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('github').create_resource(manifest(username, github_id))
   end
 
   private
-  def github_resource(username, github_id)
+  def manifest(username, github_id)
     return K8s::Resource.new(
         apiVersion: "showks.cloudnativedays.jp/v1beta1",
         kind: "GithubRepository",
