@@ -16,7 +16,7 @@ class ProjectsController < ApplicationController
     @project = Project.new(project_params)
 
     respond_to do |format|
-      if @project.save
+      if @project.provision
         format.html { redirect_to @project, notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else
@@ -34,31 +34,31 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def create_demoaccount
-    10.times do |i|
-      project = Project.new()
-      project.username = "demoaccount-#{i}"
-      project.github_id = "demoaccount-#{i}"
-      project.twitter_id = "demoaccount"
-      project.comment = "generated"
-      project.save
-    end
-
-
-    respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully created.' }
-    end
-  end
-
-  def destroy_demoaccount
-    10.times do |i|
-      project = Project.find_by_username("demoaccount-#{i}")
-      project.destroy
-    end
-    respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
-    end
-  end
+  # def create_demoaccount
+  #   10.times do |i|
+  #     project = Project.new()
+  #     project.username = "demoaccount-#{i}"
+  #     project.github_id = "demoaccount-#{i}"
+  #     project.twitter_id = "demoaccount"
+  #     project.comment = "generated"
+  #     project.save
+  #   end
+  #
+  #
+  #   respond_to do |format|
+  #     format.html { redirect_to projects_url, notice: 'Project was successfully created.' }
+  #   end
+  # end
+  #
+  # def destroy_demoaccount
+  #   10.times do |i|
+  #     project = Project.find_by_username("demoaccount-#{i}")
+  #     project.destroy
+  #   end
+  #   respond_to do |format|
+  #     format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
+  #   end
+  # end
 
   private
     def set_project
@@ -66,6 +66,6 @@ class ProjectsController < ApplicationController
     end
 
     def project_params
-      params.require(:project).permit(:username, :github_id, :twitter_id, :comment)
+      params.require(:project).permit(:username, :github_id, :twitter_id, :comment).to_h
     end
 end

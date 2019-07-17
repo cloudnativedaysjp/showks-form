@@ -5,7 +5,8 @@ class Concourse
   end
 
   def apply(username)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('concourse').create_resource(manifest(username))
+    p manifest(username)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('concoursecipipelines').create_resource(manifest(username))
   end
 
   private
@@ -15,6 +16,7 @@ class Concourse
         kind: "ConcourseCIPipeline",
         metadata: {
             name: username,
+            namespace: "default",
             labels: {
                 "controller-tools.k8s.io": "1.0"
             }
@@ -28,6 +30,26 @@ class Concourse
   end
 
   def pipeline
+<<EOF
+resources:
+- name: every-1m
+  type: time
+  source: {interval: 1m}
 
+jobs:
+- name: navi
+  plan:
+  - get: every-1m
+    trigger: true
+  - task: annoy
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source: {repository: alpine}
+      run:
+        path: echo
+        args: ["Hey! Listen!"]
+EOF
   end
 end

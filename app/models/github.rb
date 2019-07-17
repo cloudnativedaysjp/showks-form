@@ -5,7 +5,8 @@ class GitHub
   end
 
   def apply(username, github_id)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('github').create_resource(manifest(username, github_id))
+    p manifest(username, github_id)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').create_resource(manifest(username, github_id))
   end
 
   private
@@ -15,6 +16,7 @@ class GitHub
         kind: "GithubRepository",
         metadata: {
             name: username,
+            namespace: "default"
         },
         spec: {
             org: "cloudnativedaysjp",
