@@ -30,11 +30,6 @@ spec:
                 key: masterkey
           - name: RAILS_LOG_TO_STDOUT
             value: "true"
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /usr/src/showks-form/post-start.sh
         ports:
         - containerPort: 3000
 
