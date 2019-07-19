@@ -5,8 +5,11 @@ class Keycloak
   end
 
   def apply(username, password)
-    p manifest(username, password)
     @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').create_resource(manifest(username, password))
+  end
+
+  def destroy(username)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').delete_resource(manifest(username, "dummy"))
   end
 
   private
@@ -19,7 +22,7 @@ class Keycloak
             labels: {
               "controller-tools.k8s.io": "1.0"
             },
-            namespace: "default"
+            namespace: ShowksForm::Application.config.default_namespace
         },
         spec: {
             username: username,

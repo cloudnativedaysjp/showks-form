@@ -20,30 +20,76 @@ end
 class Project
   include ActiveModel::Validations
   include ActiveModel::Model
+  include ActiveModel::Conversion
 
-  attr_accessor :username, :github_id, :twitter_id, :comment, :client, :config, :resource
+  attr_accessor :username, :github_id, :twitter_id, :comment, :client, :config, :resource, :id
 
   validates_with GitHubUserValidator
-  # TODO: Implement orginal validator
-  #validates :username, uniqueness: true, presence: true, format: { with: /\A[a-z0-9\-]+\z/}, length: { maximum: 30 }
-  #validates :github_id, uniqueness: true, presence: true, length: { maximum: 30 } #FIXME: need to check validation rule about github id
+  # TODO: Implement uniqueness validator
+  validates :username, presence: true, format: { with: /\A[a-z0-9\-]+\z/}, length: { maximum: 30 }
+  validates :github_id, presence: true, length: { maximum: 30 } #FIXME: need to check validation rule about github id
   validates :twitter_id, format: { with: /\A[a-zA-Z0-9\_]+\z/}, length: { maximum: 15 }
   validates :comment, length: { maximum: 100 }
 
-  def initialize(params)
-    p params
-    @username, @github_id, @twitter_id, @comment, @password = params[:username], params[:github_id], params[:twitter_id], params[:comment], params[:password]
-    @client = K8s::Client.config(
+  def initialize
+    # TODO: Consider how to configure k8s credentials.
+  end
+
+  def save(params)
+    client = Project.create_client
+    @id, @username, @github_id = params[:username], params[:username], params[:github_id]
+    @twitter_id, @comment, @password = params[:twitter_id], params[:comment], params[:password]
+    # FIXME: How to detect provisioning error?
+    GitHub.new(client).apply(@username, @github_id)
+    Keycloak.new(client).apply(@username, @password)
+    Concourse.new(client).apply(@username)
+    # TODO: Implement tekton/argo
+  end
+
+  def destroy
+    client = Project.create_client
+    GitHub.new(client).destroy(@username)
+    Keycloak.new(client).destroy(@username)
+    Concourse.new(client).destroy(@username)
+  end
+
+  def self.create_client
+    K8s::Client.config(
         K8s::Config.load_file(
             File.expand_path 'kubeconfig'
         )
     )
   end
 
-  def provision
-    GitHub.new(@client).apply(@username, @github_id)
-    Keycloak.new(@client).apply(@username, @password)
-    Concourse.new(@client).apply(@username)
+  def self.all
+    projects = []
+    Project.create_client.api('showks.cloudnativedays.jp/v1beta1')
+      .resource('githubrepositories')
+      .list(namespace: ShowksForm::Application.config.default_namespace)
+      .each do |response|
+        p = Project.new
+        p.id = response.metadata[:name]
+        p.username = response.metadata[:name]
+        projects.append(p)
+    end
+    p projects
+    projects
+  end
+
+  def self.find(username)
+    p = Project.new
+    p.id = username
+    p.username = username
+    p
+  end
+
+
+  def persisted?
+    if @id
+      true
+    else
+      false
+    end
   end
 end
 

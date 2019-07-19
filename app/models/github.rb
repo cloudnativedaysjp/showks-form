@@ -9,20 +9,24 @@ class GitHub
     @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').create_resource(manifest(username, github_id))
   end
 
+  def destroy(username)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').delete_resource(manifest(username, "dummy"))
+  end
+
   private
   def manifest(username, github_id)
     return K8s::Resource.new(
         apiVersion: "showks.cloudnativedays.jp/v1beta1",
-        kind: "GithubRepository",
+        kind: "GitHubRepository",
         metadata: {
             name: username,
-            namespace: "default"
+            namespace: ShowksForm::Application.config.default_namespace
         },
         spec: {
             org: "cloudnativedaysjp",
             name: "showks-canvas-" + username,
-            repositoryTemplate: {
-                org: "containerdaysjp",
+            template: {
+                org: "cloudnativedaysjp",
                 name: "showks-canvas",
                 initialBranches:
                     [
@@ -34,9 +38,10 @@ class GitHub
             collaborators: [
                 {name: github_id, permission: "admin"}
             ],
-            branchProtection: {
+            branchProtections: [{
                 enforceAdmins: false,
-                requiredPullRequestReviews: nil,
+                branchName: "master",
+                requiredPullRequestReviews: {},
                 requiredStatusChecks: {
                     strict: true,
                     contexts: [],
@@ -44,8 +49,7 @@ class GitHub
                 restrictions: {
                     users: [],
                     teams: ["showks-members"],
-                },
-            },
+                },}],
             webhooks: [
                 {
                     name: "web",

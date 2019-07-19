@@ -6,6 +6,7 @@ class ProjectsController < ApplicationController
   end
 
   def show
+    # TODO: Implement show API
   end
 
   def new
@@ -13,11 +14,11 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    @project = Project.new(project_params)
+    @project = Project.new
 
     respond_to do |format|
-      if @project.provision
-        format.html { redirect_to @project, notice: 'Project was successfully created.' }
+      if @project.save(project_params)
+        format.html { redirect_to project_url(@project), notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else
         format.html { render :new }
@@ -29,7 +30,7 @@ class ProjectsController < ApplicationController
   def destroy
     @project.destroy
     respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
+      format.html { redirect_to projects_admin_list_url, notice: 'Project was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -62,10 +63,11 @@ class ProjectsController < ApplicationController
 
   private
     def set_project
+      # TODO: Implement project search
       @project = Project.find(params[:id])
     end
 
     def project_params
-      params.require(:project).permit(:username, :github_id, :twitter_id, :comment).to_h
+      params.require(:project).permit(:id, :username, :github_id, :twitter_id, :comment).to_h
     end
 end

@@ -5,8 +5,11 @@ class Concourse
   end
 
   def apply(username)
-    p manifest(username)
     @client.api('showks.cloudnativedays.jp/v1beta1').resource('concoursecipipelines').create_resource(manifest(username))
+  end
+
+  def destroy(username)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('concoursecipipelines').delete_resource(manifest(username))
   end
 
   private
@@ -16,7 +19,7 @@ class Concourse
         kind: "ConcourseCIPipeline",
         metadata: {
             name: username,
-            namespace: "default",
+            namespace: ShowksForm::Application.config.default_namespace,
             labels: {
                 "controller-tools.k8s.io": "1.0"
             }
