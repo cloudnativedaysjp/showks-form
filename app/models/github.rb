@@ -36,7 +36,7 @@ class GitHub
                     ]
             },
             collaborators: [
-                {name: github_id, permission: "admin"}
+                {name: github_id, permission: "push"}
             ],
             branchProtections: [{
                 enforceAdmins: false,
