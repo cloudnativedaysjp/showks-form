@@ -7,9 +7,10 @@ ENV APP_ROOT /usr/src/showks-form
 WORKDIR $APP_ROOT
 
 COPY Gemfile Gemfile.lock $APP_ROOT/
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash && \
-    apt-get update && \
-    apt-get install -y cmake jq mysql-client sqlite3 nodejs && \
+RUN apt-get update && \
+    apt-get install -y cmake jq sqlite3 mariadb-client && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash && \
+    apt-get install -y nodejs && \
     npm install -g yarnpkg && \
     bundle install
 COPY . $APP_ROOT/
