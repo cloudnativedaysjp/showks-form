@@ -54,11 +54,16 @@ class Project
   end
 
   def self.create_client
-    K8s::Client.config(
-        K8s::Config.load_file(
-            File.expand_path 'kubeconfig'
-        )
-    )
+    if ShowksForm::Application.config.in_cluster
+      client = K8s::Client.in_cluster_config
+    else
+      client = K8s::Client.config(
+          K8s::Config.load_file(
+              File.expand_path 'kubeconfig'
+          )
+      )
+    end
+    client
   end
 
   def self.all
@@ -67,20 +72,20 @@ class Project
       .resource('githubrepositories')
       .list(namespace: ShowksForm::Application.config.default_namespace)
       .each do |response|
-        p = Project.new
-        p.id = response.metadata[:name]
-        p.username = response.metadata[:name]
-        projects.append(p)
+        pr = Project.new
+        pr.id = response.metadata[:name]
+        pr.username = response.metadata[:name]
+        projects.append(pr)
     end
     p projects
     projects
   end
 
   def self.find(username)
-    p = Project.new
-    p.id = username
-    p.username = username
-    p
+    pr = Project.new
+    pr.id = username
+    pr.username = username
+    pr
   end
 
 

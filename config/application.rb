@@ -17,5 +17,6 @@ module ShowksForm
     # the framework and any gems in your application.
 
     config.default_namespace = "default"
+    config.in_cluster = ENV["IN_CLUSTER"]
   end
 end

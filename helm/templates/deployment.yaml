@@ -30,6 +30,8 @@ spec:
                 key: masterkey
           - name: RAILS_LOG_TO_STDOUT
             value: "true"
+          - name: IN_CLUSTER
+            value: "true"
         ports:
         - containerPort: 3000
 
