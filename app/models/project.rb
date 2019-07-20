@@ -43,6 +43,7 @@ class Project
     GitHub.new(client).apply(@username, @github_id)
     Keycloak.new(client).apply(@username, @password)
     Concourse.new(client).apply(@username)
+    Argocd.new(client).apply(@username)
     # TODO: Implement tekton/argo
   end
 
@@ -51,6 +52,7 @@ class Project
     GitHub.new(client).destroy(@username)
     Keycloak.new(client).destroy(@username)
     Concourse.new(client).destroy(@username)
+    Argocd.new(client).destroy(@username)
   end
 
   def self.create_client
