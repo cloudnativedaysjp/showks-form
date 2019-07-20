@@ -29,8 +29,9 @@ class ProjectsController < ApplicationController
 
   def destroy
     @project.destroy
+    sleep(0.2)
     respond_to do |format|
-      format.html { redirect_to projects_admin_list_url, notice: 'Project was successfully destroyed.' }
+      format.html { redirect_to "/projects/admin/list", notice: 'Project was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

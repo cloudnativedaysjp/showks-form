@@ -1,0 +1,59 @@
+resources:
+- name: app
+  type: git
+  check_every: 3m
+  webhook_token: ((github_webhook_token))
+  source:
+    uri: https://github.com/cloudnativedaysjp/showks-canvas-USERNAME
+    branch: staging
+
+- name: container-image
+  type: docker-image
+  source:
+    repository: cloudnativedaysjp/showks-canvas-USERNAME
+    username: ((registry_user))
+    password: ((registry_password))
+
+- name: concourse-pipelines
+  type: git
+  check_every: 3m
+  source:
+    uri: https://github.com/cloudnativedaysjp/showks-concourse-pipelines
+    branch: master
+
+- name: k8s-manifests
+  type: git
+  check_every: 3m
+  source:
+    uri: git@github.com:cloudnativedaysjp/showks-manifests-stg.git
+    branch: master
+    private_key: GITHUB_PRIVATE_KEY
+
+jobs:
+- name: build-image
+  plan:
+  - get: app
+    trigger: true
+  - put: container-image
+    params:
+      build: app/
+      tag_file: app/.git/refs/heads/staging
+      tag_prefix: stg-
+      tag_as_latest: true
+- name: upload-manifest
+  plan:
+  - get: app
+    trigger: true
+    passed: ["build-image"]
+  - get: k8s-manifests
+  - get: concourse-pipelines
+  - task: update-manifest
+    file: concourse-pipelines/common/tasks/upload_manifest.yaml
+    params:
+      APP_NAME: showks-canvas-USERNAME
+      TAG_PREFIX: stg-
+      BRANCH: staging
+      USERID: USERNAME
+      NAME_SUFFIX: -temp
+      VHOST_DOMAIN: .stg.showks.containerdays.jp
+      PROJECT_NAME: ipc-containerdays

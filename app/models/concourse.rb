@@ -5,20 +5,55 @@ class Concourse
   end
 
   def apply(username)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('concoursecipipelines').create_resource(manifest(username))
+    set_pipeline("staging", username)
+    set_pipeline("production", username)
+    set_pipeline("pr", username)
   end
 
   def destroy(username)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('concoursecipipelines').delete_resource(manifest(username))
+    @client.api('showks.cloudnativedays.jp/v1beta1')
+        .resource('concoursecipipelines')
+        .delete_resource(manifest(username, "staging", ""))
+    @client.api('showks.cloudnativedays.jp/v1beta1')
+        .resource('concoursecipipelines')
+        .delete_resource(manifest(username, "production",""))
+    @client.api('showks.cloudnativedays.jp/v1beta1')
+        .resource('concoursecipipelines')
+        .delete_resource(manifest(username, "pr", ""))
+  end
+
+  def load_yaml(env)
+    YAML.load_file("app/assets/concourse-pipeline-templates/" + env + ".yaml")
+  end
+
+  def set_pipeline(env, username)
+    y = load_yaml(env)
+
+    if env == "staging" || env == "production"
+      y["resources"].select {|n| n["name"] == "app"}[0]["webhook_token"] = ENV['WEBHOOK_TOKEN']
+      y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["username"] = ENV['REGISTRY_USERNAME']
+      y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["password"] = ENV['REGISTRY_PASSWORD']
+      y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["repository"] = ENV['REGISTRY_URL'] + "-USERNAME"
+    elsif env == "pr"
+      y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["webhook_token"] = ENV['WEBHOOK_TOKEN']
+      y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["source"]["access_token"] = ENV['GITHUB_ACCESS_TOKEN']
+      y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["source"]["github_key"] = ENV['GITHUB_PRIVATE_KEY']
+      y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["source"]["repo"] = ENV['REGISTRY_URL'] + "-USERNAME"
+    end
+
+    pipeline = YAML.dump(y).gsub("USERNAME", username).gsub("GITHUB_PRIVATE_KEY", + '"' + ENV["GITHUB_PRIVATE_KEY"] + '"')
+    @client.api('showks.cloudnativedays.jp/v1beta1')
+        .resource('concoursecipipelines')
+        .create_resource(manifest(username, env, pipeline))
   end
 
   private
-  def manifest(username)
+  def manifest(username, env, pipeline)
     return K8s::Resource.new(
         apiVersion: "showks.cloudnativedays.jp/v1beta1",
         kind: "ConcourseCIPipeline",
         metadata: {
-            name: username,
+            name: username + "-" + env,
             namespace: ShowksForm::Application.config.default_namespace,
             labels: {
                 "controller-tools.k8s.io": "1.0"
@@ -26,33 +61,9 @@ class Concourse
         },
         spec: {
             target: "main",
-            pipeline: username,
+            pipeline: username + "-" + env,
             manifest: pipeline
         },
         )
-  end
-
-  def pipeline
-<<EOF
-resources:
-- name: every-1m
-  type: time
-  source: {interval: 1m}
-
-jobs:
-- name: navi
-  plan:
-  - get: every-1m
-    trigger: true
-  - task: annoy
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source: {repository: alpine}
-      run:
-        path: echo
-        args: ["Hey! Listen!"]
-EOF
   end
 end
