@@ -68,6 +68,6 @@ class ProjectsController < ApplicationController
     end
 
     def project_params
-      params.require(:project).permit(:id, :username, :github_id, :twitter_id, :comment).to_h
+      params.require(:project).permit(:id, :password, :username, :github_id, :twitter_id, :comment).to_h
     end
 end

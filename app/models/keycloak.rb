@@ -5,15 +5,18 @@ class Keycloak
   end
 
   def apply(username, password)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').create_resource(manifest(username, password))
+    p password
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').create_resource(manifest(username))
+    @client.api('v1').resource('secrets').create_resource(secret(username, password))
   end
 
   def destroy(username)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').delete_resource(manifest(username, "dummy"))
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('keycloakusers').delete_resource(manifest(username))
+    @client.api('v1').resource('secrets').delete_resource(secret(username, "dummy"))
   end
 
   private
-  def manifest(username, password)
+  def manifest(username)
     return K8s::Resource.new(
         apiVersion: "showks.cloudnativedays.jp/v1beta1",
         kind: "KeyCloakUser",
@@ -26,8 +29,22 @@ class Keycloak
         },
         spec: {
             username: username,
-            password: password,
+            passwordSecretName: username,
             realm: "master"
+        },
+        )
+  end
+
+  def secret(username, password)
+    return K8s::Resource.new(
+        apiVersion: "v1",
+        kind: "Secret",
+        metadata: {
+            name: username,
+            namespace: ShowksForm::Application.config.default_namespace
+        },
+        stringData: {
+            password: password
         },
         )
   end
