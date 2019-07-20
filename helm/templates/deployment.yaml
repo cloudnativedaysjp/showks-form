@@ -23,15 +23,41 @@ spec:
             value: "production"
           - name: RAILS_SERVE_STATIC_FILES
             value: "true"
-          - name: RAILS_MASTER_KEY
-            valueFrom:
-              secretKeyRef:
-                name: masterkey
-                key: masterkey
           - name: RAILS_LOG_TO_STDOUT
             value: "true"
           - name: IN_CLUSTER
             value: "true"
+          - name: WEBHOOK_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: webhook_token
+          - name: REGISTRY_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: registry_username
+          - name: REGISTRY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: registry_password
+          - name: REGISTRY_URL
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: registry_url
+          - name: GITHUB_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: github_access_token
+          - name: GITHUB_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: github_private_key
+
         ports:
         - containerPort: 3000
 
