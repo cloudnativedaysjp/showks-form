@@ -54,7 +54,7 @@ class GitHub
                 {
                     name: "stg",
                     config: {
-                        url: "http://concourse.udcp.info/api/v1/teams/showks-pipelines/pipelines/" + username + "-stg/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
+                        url: "https://concourse.showks.cloudnativedays.jp/api/v1/teams/showks-pipelines/pipelines/" + username + "-stg/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
                         contentType: "json"
                     },
                     events: ["push"],
@@ -63,7 +63,7 @@ class GitHub
                 {
                     name: "prod",
                     config: {
-                        url: "http://concourse.udcp.info/api/v1/teams/showks-pipelines/pipelines/" + username + "-prod/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
+                        url: "http://concourse.showks.cloudnativedays.jp/api/v1/teams/showks-pipelines/pipelines/" + username + "-prod/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
                         contentType: "json"
                     },
                     events: ["push"],
