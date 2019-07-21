@@ -23,6 +23,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
+  namespace: showks-system
 roleRef:
   kind: ClusterRole
   name: {{ .Chart.Name }}-access
