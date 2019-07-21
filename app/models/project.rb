@@ -8,7 +8,7 @@ class GitHubUserValidator < ActiveModel::Validator
     if record.username.include?("demoaccount")
       return true
     end
-    client = Octokit::Client.new(login: Rails.application.credentials.github[:username], password: Rails.application.credentials.github[:password])
+    client = Octokit::Client.new(:access_token => ENV["GITHUB_ACCESS_TOKEN"])
     begin
       client.user(record.github_id)
     rescue
