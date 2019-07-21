@@ -66,7 +66,7 @@ class Concourse
         spec: {
             target: "main",
             pipeline: username + "-" + env,
-            manifest: pipelin,
+            manifest: pipeline,
             public: true
         },
         )
