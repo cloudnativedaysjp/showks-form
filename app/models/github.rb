@@ -4,17 +4,17 @@ class GitHub
     @client = client
   end
 
-  def apply(username, github_id)
-    p manifest(username, github_id)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').create_resource(manifest(username, github_id))
+  def apply(username, github_id, twitter_id, comment)
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').create_resource(manifest(username, github_id, twitter_id, comment))
   end
 
   def destroy(username)
-    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').delete_resource(manifest(username, "dummy"))
+    @client.api('showks.cloudnativedays.jp/v1beta1').resource('githubrepositories').delete_resource(manifest(username, "dummy", "", ""))
   end
 
   private
-  def manifest(username, github_id)
+  def manifest(username, github_id, twitter_id, comment)
+    json = {userName: username,gitHubId: github_id,twitterId: twitter_id,comment: comment}
     return K8s::Resource.new(
         apiVersion: "showks.cloudnativedays.jp/v1beta1",
         kind: "GitHubRepository",
@@ -33,7 +33,12 @@ class GitHub
                         "refs/heads/master:refs/heads/master",
                         "refs/heads/master:refs/heads/staging",
                         "refs/heads/master:refs/heads/feature"
-                    ]
+                    ],
+                initialCommits:
+                    [{
+                        path: "src/data/author.json",
+                        contents: JSON.dump(json),
+                     }]
             },
             collaborators: [
                 {name: github_id, permission: "push"}

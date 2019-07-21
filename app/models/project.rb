@@ -40,7 +40,7 @@ class Project
     @id, @username, @github_id = params[:username], params[:username], params[:github_id]
     @twitter_id, @comment, @password = params[:twitter_id], params[:comment], params[:password]
     # FIXME: How to detect provisioning error?
-    GitHub.new(client).apply(@username, @github_id)
+    GitHub.new(client).apply(@username, @github_id, @twitter_id, @comment)
     Keycloak.new(client).apply(@username, @password)
     Concourse.new(client).apply(@username)
     Argocd.new(client).apply(@username)
