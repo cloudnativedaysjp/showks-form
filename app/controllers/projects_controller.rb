@@ -6,6 +6,7 @@ class ProjectsController < ApplicationController
   end
 
   def show
+    # TODO: Implement show API
   end
 
   def new
@@ -13,11 +14,11 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    @project = Project.new(project_params)
+    @project = Project.new
 
     respond_to do |format|
-      if @project.save
-        format.html { redirect_to @project, notice: 'Project was successfully created.' }
+      if @project.save(project_params)
+        format.html { redirect_to project_url(@project), notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else
         format.html { render :new }
@@ -28,44 +29,46 @@ class ProjectsController < ApplicationController
 
   def destroy
     @project.destroy
+    sleep(0.2)
     respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
+      format.html { redirect_to "/projects/admin/list", notice: 'Project was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
-  def create_demoaccount
-    10.times do |i|
-      project = Project.new()
-      project.username = "demoaccount-#{i}"
-      project.github_id = "demoaccount-#{i}"
-      project.twitter_id = "demoaccount"
-      project.comment = "generated"
-      project.save
-    end
-
-
-    respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully created.' }
-    end
-  end
-
-  def destroy_demoaccount
-    10.times do |i|
-      project = Project.find_by_username("demoaccount-#{i}")
-      project.destroy
-    end
-    respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
-    end
-  end
+  # def create_demoaccount
+  #   10.times do |i|
+  #     project = Project.new()
+  #     project.username = "demoaccount-#{i}"
+  #     project.github_id = "demoaccount-#{i}"
+  #     project.twitter_id = "demoaccount"
+  #     project.comment = "generated"
+  #     project.save
+  #   end
+  #
+  #
+  #   respond_to do |format|
+  #     format.html { redirect_to projects_url, notice: 'Project was successfully created.' }
+  #   end
+  # end
+  #
+  # def destroy_demoaccount
+  #   10.times do |i|
+  #     project = Project.find_by_username("demoaccount-#{i}")
+  #     project.destroy
+  #   end
+  #   respond_to do |format|
+  #     format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
+  #   end
+  # end
 
   private
     def set_project
+      # TODO: Implement project search
       @project = Project.find(params[:id])
     end
 
     def project_params
-      params.require(:project).permit(:username, :github_id, :twitter_id, :comment)
+      params.require(:project).permit(:id, :password, :username, :github_id, :twitter_id, :comment).to_h
     end
 end

@@ -42,4 +42,5 @@ app/assets/showks-concourse-pipelines/
 app/assets/showks-spinnaker-pipelines/
 secret.yml
 
-
+pwd
+kubeconfig

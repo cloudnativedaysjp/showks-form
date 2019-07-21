@@ -2,42 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-  namespace: showks
   labels:
     app: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-spec:
-  replicas: 
-  selector:
-    matchLabels:
-      app: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-    spec:
-      containers:
-        - name: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-          image: gcr.io/ipc-cloudnativedays/{{ .Chart.Name }}:{{ .Values.image.tag }}
-          env:
-            - name: DOMAIN
-              valueFrom:
-                configMapKeyRef:
-                  name: showks-config
-                  key: domain
-            - name: AGGREGATOR_URL
-              value: https://aggregator$(DOMAIN)
-          ports:
-            - name: app-port
-              containerPort: 3000
-              protocol: TCP
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-  labels:
-    app: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-  namespace: showks
+  namespace: showks-system
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -50,72 +17,62 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}{{ .Values.nameSuffix }}
-        image: gcr.io/ipc-cloudnativedays/{{ .Chart.Name }}:{{ .Values.image.tag }}
+        image: cloudnativedaysjp/{{ .Chart.Name }}:{{ .Values.image.tag }}
         env:
           - name: RAILS_ENV
             value: "production"
-          - name: DB_HOST
-            value: "mysql.showks.svc.cluster.local"
-          - name: DB_USERNAME
-            value: "root"
-          - name: DB_PASSWORD
-            value: "passw0rd"
-          - name: DB_DATABASE
-            value: "showks"
           - name: RAILS_SERVE_STATIC_FILES
             value: "true"
-          - name: RAILS_MASTER_KEY
-            valueFrom:
-              secretKeyRef:
-                name: masterkey
-                key: masterkey
           - name: RAILS_LOG_TO_STDOUT
             value: "true"
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /usr/src/showks-form/post-start.sh
+          - name: IN_CLUSTER
+            value: "true"
+          - name: WEBHOOK_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: webhook_token
+          - name: REGISTRY_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: showks-form
+                key: registry_username
+          - name: REGISTRY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: registry_password
+          - name: REGISTRY_URL
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: registry_url
+          - name: GITHUB_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: github_access_token
+          - name: GITHUB_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: github_private_key
+          - name: GITHUB_ORG
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: github_org
+          - name: STORAGE_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: storage_access_key
+          - name: STORAGE_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: storage_secret_key
+
         ports:
         - containerPort: 3000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mysql
-  namespace: showks
-  labels:
-    app: mysql
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mysql
-  template:
-    metadata:
-      labels:
-        app: mysql
-    spec:
-      containers:
-      - name: mysql
-        image: mysql:5.7
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: passw0rd
-        - name: MYSQL_DATABASE
-          value: showks
-        args: ["--ignore-db-dir=lost+found"]
-        ports:
-        - containerPort: 3306
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
-        - name: mysqld-config
-          mountPath: /etc/mysql/mysql.conf.d/
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pv-claim
-      - name: mysqld-config
-        configMap:
-          name: mysqld-config
+
