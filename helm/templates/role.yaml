@@ -6,12 +6,12 @@ metadata:
   namespace: showks-system
 rules:
 - apiGroups: ["","apps","extensions"]
-  resources: ["services","deployments","ingresses", "pods"]
-  verbs: ["get", "watch", "list"]
-- apiGroups: ["showks.cloudnativedays.jp/v1beta1"]
+  resources: ["services","deployments","ingresses", "pods", "secrets"]
+  verbs: ["*"]
+- apiGroups: ["showks.cloudnativedays.jp"]
   resources: ["*"]
   verbs: ["*"]
-- apiGroups: ["argoproj.io/v1alpha1"]
+- apiGroups: ["argoproj.io"]
   resources: ["*"]
   verbs: ["*"]
 ---
