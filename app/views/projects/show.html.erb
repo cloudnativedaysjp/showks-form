@@ -14,15 +14,13 @@
     </tr>
     <tr>
       <td colspan="2">
-        <%= link_to("※ GitHubからInvitationが送信されますので、こちらのリンクから承諾をお願いします",
-                    "https://github.com/cloudnativedaysjp/showks-canvas-#{@project.username}/invitations") %>
+        ※ GitHubからInvitationが送信されますので、<%= link_to("こちらのリンク",
+                    "https://github.com/cloudnativedaysjp/showks-canvas-#{@project.username}/invitations") %>から承諾をお願いします
       </td>
     </tr>
-
     <tr>
       <td colspan="2">
-        <%= link_to("GitHub repository",
-                    "https://github.com/cloudnativedaysjp/showks-canvas-#{@project.username}") %>
+        &nbsp;
       </td>
     </tr>
     <tr>
@@ -40,6 +38,11 @@
       </td>
     </tr>
     <tr>
+      <td colspan="2">
+        &nbsp;
+      </td>
+    </tr>
+    <tr>
       <td>
         <%= link_to("Canvas",
                     "https://showks-canvas-#{@project.username}.stg.showks.cloudnativedays.jp/") %><br />
@@ -47,6 +50,16 @@
       <td>
         <%= link_to("Canvas",
                     "https://showks-canvas-#{@project.username}.showks.cloudnativedays.jp/") %><br />
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        ※Canvasのデプロイには、最大5分程度かかります
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        &nbsp;
       </td>
     </tr>
     <tr>
@@ -65,6 +78,17 @@
                     "https://concourse.showks.cloudnativedays.jp/teams/showks-pipelines/pipelines/#{@project.username}-pr") %><br />
       </td>
       <td>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        &nbsp;
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <%= link_to("GitHub repository",
+                    "https://github.com/cloudnativedaysjp/showks-canvas-#{@project.username}") %>
       </td>
     </tr>
   </table>
