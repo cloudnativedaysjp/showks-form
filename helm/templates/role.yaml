@@ -40,7 +40,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: {{ .Chart.Name }}-access-binding
-  namespace: showks-system
+  namespace: showks
 subjects:
 - kind: ServiceAccount
   name: default
