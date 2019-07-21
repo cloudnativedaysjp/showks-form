@@ -1,7 +1,7 @@
 resources:
 - name: app
   type: git
-  check_every: 3m
+  check_every: 1m
   webhook_token: ((github_webhook_token))
   source:
     uri: https://github.com/cloudnativedaysjp/showks-canvas-USERNAME
@@ -48,12 +48,15 @@ jobs:
   - get: k8s-manifests
   - get: concourse-pipelines
   - task: update-manifest
-    file: concourse-pipelines/common/tasks/upload_manifest.yaml
+    file: concourse-pipelines/common/tasks/upload_manifest_s3.yaml
     params:
       APP_NAME: showks-canvas-USERNAME
       TAG_PREFIX: stg-
       BRANCH: staging
       USERID: USERNAME
       NAME_SUFFIX: -temp
-      VHOST_DOMAIN: .stg.showks.containerdays.jp
+      VHOST_DOMAIN: .stg.showks.cloudnativedays.jp
       PROJECT_NAME: ipc-containerdays
+      AWS_ACCESS_KEY_ID: ((storage_access_key))
+      AWS_SECRET_ACCESS_KEY: ((storage_secret_key))
+      AWS_DEFAULT_REGION: ap-northeast-1

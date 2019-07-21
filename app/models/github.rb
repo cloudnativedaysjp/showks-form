@@ -52,9 +52,18 @@ class GitHub
                 },}],
             webhooks: [
                 {
-                    name: "web",
+                    name: "stg",
                     config: {
-                        url: "https://example.com",
+                        url: "http://concourse.udcp.info/api/v1/teams/showks-pipelines/pipelines/" + username + "-stg/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
+                        contentType: "json"
+                    },
+                    events: ["push"],
+                    active: true
+                },
+                {
+                    name: "prod",
+                    config: {
+                        url: "http://concourse.udcp.info/api/v1/teams/showks-pipelines/pipelines/" + username + "-prod/resources/app/check/webhook?webhook_token=" + ENV["WEBHOOK_TOKEN"],
                         contentType: "json"
                     },
                     events: ["push"],

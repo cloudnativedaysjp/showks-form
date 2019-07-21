@@ -5,18 +5,18 @@ class Concourse
   end
 
   def apply(username)
-    set_pipeline("staging", username)
-    set_pipeline("production", username)
+    set_pipeline("stg", username)
+    set_pipeline("prod", username)
     set_pipeline("pr", username)
   end
 
   def destroy(username)
     @client.api('showks.cloudnativedays.jp/v1beta1')
         .resource('concoursecipipelines')
-        .delete_resource(manifest(username, "staging", ""))
+        .delete_resource(manifest(username, "stg", ""))
     @client.api('showks.cloudnativedays.jp/v1beta1')
         .resource('concoursecipipelines')
-        .delete_resource(manifest(username, "production",""))
+        .delete_resource(manifest(username, "prod",""))
     @client.api('showks.cloudnativedays.jp/v1beta1')
         .resource('concoursecipipelines')
         .delete_resource(manifest(username, "pr", ""))
@@ -29,11 +29,15 @@ class Concourse
   def set_pipeline(env, username)
     y = load_yaml(env)
 
-    if env == "staging" || env == "production"
+    if env == "stg" || env == "prod"
       y["resources"].select {|n| n["name"] == "app"}[0]["webhook_token"] = ENV['WEBHOOK_TOKEN']
       y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["username"] = ENV['REGISTRY_USERNAME']
       y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["password"] = ENV['REGISTRY_PASSWORD']
       y["resources"].select {|n| n["name"] == "container-image"}[0]["source"]["repository"] = ENV['REGISTRY_URL'] + "-USERNAME"
+      y["jobs"].select{|n| n["name"] == "upload-manifest"}[0]["plan"]
+          .select{|n| n["task"] == "update-manifest"}[0]["params"]["AWS_ACCESS_KEY_ID"] = ENV['STORAGE_ACCESS_KEY']
+      y["jobs"].select{|n| n["name"] == "upload-manifest"}[0]["plan"]
+          .select{|n| n["task"] == "update-manifest"}[0]["params"]["AWS_SECRET_ACCESS_KEY"] = ENV['STORAGE_SECRET_KEY']
     elsif env == "pr"
       y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["webhook_token"] = ENV['WEBHOOK_TOKEN']
       y["resources"].select {|n| n["name"] == "showks-canvas-pr"}[0]["source"]["access_token"] = ENV['GITHUB_ACCESS_TOKEN']

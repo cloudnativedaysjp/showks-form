@@ -62,6 +62,16 @@ spec:
               secretKeyRef:
                 name: showks-secret
                 key: github_org
+          - name: STORAGE_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: storage_access_key
+          - name: STORAGE_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: showks-secret
+                key: storage_secret_key
 
         ports:
         - containerPort: 3000

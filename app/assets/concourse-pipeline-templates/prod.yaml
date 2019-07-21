@@ -49,7 +49,7 @@ jobs:
       load: container-image
       tag_file: app/.git/refs/heads/master
       tag_prefix: prod-
-- name: update-manifest
+- name: upload-manifest
   plan:
   - get: app
     trigger: true
@@ -57,11 +57,14 @@ jobs:
   - get: k8s-manifests
   - get: concourse-pipelines
   - task: update-manifest
-    file: concourse-pipelines/common/tasks/upload_manifest.yaml
+    file: concourse-pipelines/common/tasks/upload_manifest_s3.yaml
     params:
       APP_NAME: showks-canvas-USERNAME
       TAG_PREFIX: prod-
       BRANCH: master
       USERID: USERNAME
-      VHOST_DOMAIN: .prod.showks.containerdays.jp
+      VHOST_DOMAIN: .showks.cloudnativedays.jp
       PROJECT_NAME: ipc-containerdays
+      AWS_ACCESS_KEY_ID: ((storage_access_key))
+      AWS_SECRET_ACCESS_KEY: ((storage_secret_key))
+      AWS_DEFAULT_REGION: ap-northeast-1
