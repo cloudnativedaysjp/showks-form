@@ -31,7 +31,7 @@ module ShowksForm
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
 
-    config.default_namespace = "default"
+    config.default_namespace = "showks"
     config.in_cluster = ENV["IN_CLUSTER"]
   end
 end
