@@ -17,7 +17,9 @@ class ProjectsController < ApplicationController
     @project = Project.new
 
     respond_to do |format|
-      if @project.save(project_params)
+      @project.save(project_params)
+      if @project.valid?
+        @project.commit
         format.html { redirect_to project_url(@project), notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else

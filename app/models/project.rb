@@ -8,7 +8,7 @@ class GitHubUserValidator < ActiveModel::Validator
     if record.username.include?("demoaccount")
       return true
     end
-    #client = Octokit::Client.new(login: Rails.application.credentials.github[:username], password: Rails.application.credentials.github[:password])
+    client = Octokit::Client.new(login: Rails.application.credentials.github[:username], password: Rails.application.credentials.github[:password])
     begin
       client.user(record.github_id)
     rescue
@@ -35,16 +35,18 @@ class Project
     # TODO: Consider how to configure k8s credentials.
   end
 
-  def save(params)
+  def commit
     client = Project.create_client
-    @id, @username, @github_id = params[:username], params[:username], params[:github_id]
-    @twitter_id, @comment, @password = params[:twitter_id], params[:comment], params[:password]
     # FIXME: How to detect provisioning error?
     GitHub.new(client).apply(@username, @github_id, @twitter_id, @comment)
     Keycloak.new(client).apply(@username, @password)
     Concourse.new(client).apply(@username)
     Argocd.new(client).apply(@username)
-    # TODO: Implement tekton/argo
+  end
+
+  def save(params)
+    @id, @username, @github_id = params[:username], params[:username], params[:github_id]
+    @twitter_id, @comment, @password = params[:twitter_id], params[:comment], params[:password]
   end
 
   def destroy
